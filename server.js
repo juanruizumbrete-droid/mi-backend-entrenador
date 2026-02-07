@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Configuramos la IA usando la llave que guardamos en Render
+// IMPORTANTE: Aquí usamos la llave que configuramos en Render
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post("/api/chat", async (req, res) => {
@@ -16,12 +16,12 @@ app.post("/api/chat", async (req, res) => {
     const response = await result.response;
     res.json({ text: response.text() });
   } catch (error) {
-    console.error("Error en el servidor:", error);
-    res.status(500).json({ error: "Error al conectar con la IA" });
+    console.error("Error detallado:", error);
+    res.status(500).json({ error: "La IA no responde, revisa la API KEY" });
   }
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`Servidor funcionando en puerto ${PORT}`);
+  console.log("Servidor arrancado con éxito");
 });
