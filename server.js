@@ -6,13 +6,13 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 dotenv.config();
 
 const app = express();
-// Esto permite que tu web de Vercel pueda hablar con este servidor
+// CORS configurado para que Vercel y Netlify hablen con Render sin problemas
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 10000;
 
-// Configuración de Gemini 3 para 2026
+// Cliente de IA preparado para la Serie 3
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post("/api/chat", async (req, res) => {
@@ -23,7 +23,7 @@ app.post("/api/chat", async (req, res) => {
       return res.status(400).json({ error: "No se recibió ningún mensaje" });
     }
 
-    // CONFIGURACIÓN CLAVE: Usamos v1alpha para activar el razonamiento de Gemini 3
+    // Usamos v1alpha para mantener la compatibilidad con modelos dinámicos de 2026
     const model = genAI.getGenerativeModel({ 
       model: "gemini-3-flash-preview" 
     }, { apiVersion: 'v1alpha' });
@@ -31,8 +31,9 @@ app.post("/api/chat", async (req, res) => {
     const result = await model.generateContent({
       contents: [{ role: "user", parts: [{ text: message }] }],
       generationConfig: {
-        // Nivel de pensamiento optimizado para rapidez táctica
-        thinking_config: { thinking_level: "low" }
+        // Quitamos thinking_level para que la IA use su propia potencia según la dificultad
+        maxOutputTokens: 2500, // Permite entrenamientos largos sin cortarse
+        temperature: 0.7,      // Equilibrio entre precisión técnica y fluidez
       }
     });
 
@@ -42,17 +43,17 @@ app.post("/api/chat", async (req, res) => {
   } catch (error) {
     console.error("Error en la conexión con Gemini 3:", error);
     res.status(500).json({ 
-      error: "Error en el servidor de IA", 
+      error: "El Mister está analizando la jugada...", 
       details: error.message 
     });
   }
 });
 
-// Ruta de prueba para saber si el servidor está vivo
+// Ruta de salud del servidor
 app.get("/", (req, res) => {
-  res.send("Servidor del Entrenador IA (Gemini 3) funcionando correctamente.");
+  res.send("Servidor del Entrenador IA (Gemini 3) optimizado y listo.");
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log(`Servidor activo en puerto ${PORT}`);
 });
