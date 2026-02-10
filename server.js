@@ -14,8 +14,8 @@ const PORT = process.env.PORT || 10000;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post("/api/chat", async (req, res) => {
-  // AUMENTAMOS EL TIEMPO LÍMITE A 3 MINUTOS (180000 ms)
-  req.setTimeout(180000); 
+  // AUMENTAMOS TIEMPO A 4 MINUTOS (240000 ms)
+  req.setTimeout(240000); 
 
   try {
     const { message } = req.body;
@@ -28,8 +28,8 @@ app.post("/api/chat", async (req, res) => {
     const result = await model.generateContent({
       contents: [{ role: "user", parts: [{ text: message }] }],
       generationConfig: {
-        maxOutputTokens: 4000, // Más tokens para sesiones largas
-        temperature: 0.5,      // Menos creatividad, más velocidad y precisión
+        maxOutputTokens: 4000, 
+        temperature: 0.4, // Más bajo = más rápido y menos creativo
       }
     });
 
@@ -40,7 +40,7 @@ app.post("/api/chat", async (req, res) => {
     console.error("Error táctico:", error);
     res.status(500).json({ 
       error: "Tiempo de respuesta agotado", 
-      message: "El Mister está analizando una jugada muy compleja, reinténtalo." 
+      message: "El servidor está lento, reinténtalo." 
     });
   }
 });
