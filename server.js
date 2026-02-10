@@ -14,8 +14,8 @@ const PORT = process.env.PORT || 10000;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post("/api/chat", async (req, res) => {
-  // CONFIGURACIÓN DE TIEMPO: Damos 2 minutos de margen para sesiones complejas
-  req.setTimeout(120000); 
+  // AUMENTAMOS EL TIEMPO LÍMITE A 3 MINUTOS (180000 ms)
+  req.setTimeout(180000); 
 
   try {
     const { message } = req.body;
@@ -28,8 +28,8 @@ app.post("/api/chat", async (req, res) => {
     const result = await model.generateContent({
       contents: [{ role: "user", parts: [{ text: message }] }],
       generationConfig: {
-        maxOutputTokens: 3500, // Espacio suficiente para los 5 bloques de la sesión
-        temperature: 0.6,      // Más rápido y técnico
+        maxOutputTokens: 4000, // Más tokens para sesiones largas
+        temperature: 0.5,      // Menos creatividad, más velocidad y precisión
       }
     });
 
@@ -37,14 +37,14 @@ app.post("/api/chat", async (req, res) => {
     res.json({ text: response.text() });
 
   } catch (error) {
-    console.error("Error en sesión larga:", error);
+    console.error("Error táctico:", error);
     res.status(500).json({ 
-      error: "Análisis prolongado", 
-      message: "El Mister está detallando los ejercicios, espera un momento..." 
+      error: "Tiempo de respuesta agotado", 
+      message: "El Mister está analizando una jugada muy compleja, reinténtalo." 
     });
   }
 });
 
-app.get("/", (req, res) => res.send("Servidor Gemini 3 - Generador Optimizado OK"));
+app.get("/", (req, res) => res.send("Servidor Gemini 3 Flash listo"));
 
-app.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`Servidor activo en puerto ${PORT}`));
